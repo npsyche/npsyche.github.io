@@ -1,0 +1,23 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>苏三个人技术博客</title>
+    <link>https://npsyche.github.io/</link>
+    <description>Recent content on 苏三个人技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-Hans</language>
+    <lastBuildDate>Tue, 26 Apr 2022 11:20:25 +0800</lastBuildDate>
+    
+        <atom:link href="https://npsyche.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Posts</title>
+      <link>https://npsyche.github.io/posts/</link>
+      <pubDate>Tue, 26 Apr 2022 11:20:25 +0800</pubDate>
+      
+      <guid>https://npsyche.github.io/posts/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
