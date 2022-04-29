@@ -1,0 +1,64 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>2022 on 苏三个人技术博客</title>
+    <link>https://npsyche.github.io/archives/2022/</link>
+    <description>Recent content in 2022 on 苏三个人技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-Hans</language>
+    <lastBuildDate>Fri, 29 Apr 2022 20:31:45 +0800</lastBuildDate>
+    
+        <atom:link href="https://npsyche.github.io/archives/2022/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>万级并发之linux内核tcp参数调优</title>
+      <link>https://npsyche.github.io/2022/fastfast/</link>
+      <pubDate>Fri, 29 Apr 2022 20:31:45 +0800</pubDate>
+      
+      <guid>https://npsyche.github.io/2022/fastfast/</guid>
+      <description>1.引言
+对于网站经营者来说，让用户等待的时间过长，也许会造成毁灭性的后果。
+我见过很多人为了享用某家特色小吃而在餐厅门口乐此不疲地排着长队，但没有听说有多少用户执着地等待着一个速度缓慢的站点而不去尝试别的站点。——《构建高性能web站点》
+2.了解性能差异
+了解性能差异：站在CPU的角度看世界
+内容来源：http://cizixs.com/2017/01/03/how-slow-is-disk-and-network/
+计算机不同组件速度差异金字塔见下图（不够直观）
+越往上速度越快，容量越小，而价格越高。
+​ 我们都知道CPU很快，硬盘很慢，那么站在CPU的角度，这些设备到底有多慢呢？见下方图表
+​ 扩展阅读：
+世界各地ping文时间：https://wondernetwork.com/pings/
+​ 结论：磁盘和网络真的很慢，性能优化是个复杂的系统性的活。
+3.记一次性能优化的过程
+来自某接口需求，性能要求支撑万级TPS，10ms返回。
+程序逻辑很简单，只是简单的k/v请求。
+技术选型：
+选用openresty容器（一个基于 Nginx 与Lua 的高性能 Web 平台），redis存储（毫无悬念），避免磁盘读取拖慢速度
+服务器配置：
+部署在同一区域（毫无悬念），减少不同城市网络访问。
+8核，16G
+服务稳定性要求：
+线上服务没有返回时，将进入离线计算，调用端做了保护，因此就算服务崩了也没事，唯一关注：快！
+因此大胆的作吧~
+服务器内核参数调整：
+ulimit -n 999999
+重启失效
+或：
+在/etc/security/limits.conf加入一下内容
+# 最大不能超过fs.nr_open值, 分别为单用户进程最大文件打开数，soft指软性限制,hard指硬性限制
+# End of file
+root soft nofile 999999
+root hard nofile 999999
+* soft nofile 999999
+* hard nofile 999999
+重启使上述内容生效
+不愿意重启就使用以下命令
+sysctl -p
+然，并没有什么卵用。。。
+wrk压力测试结果：上万并发，50%响应100多ms，90%响应200多ms，差了一个数量级
+继续优化，还有什么需要考虑？
+第一步，考虑优化web容器。
+nginx参数优化</description>
+    </item>
+    
+  </channel>
+</rss>

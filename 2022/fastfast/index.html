@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>苏三个人技术博客  | 万级并发之linux内核tcp参数调优</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://npsyche.github.io/css/blog.css" />
+    </head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://npsyche.github.io/">Home</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://npsyche.github.io/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        万级并发之linux内核tcp参数调优
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+            <div class="content">
+                <p><strong>1.引言</strong></p>
+<p>对于网站经营者来说，让用户等待的时间过长，也许会造成毁灭性的后果。</p>
+<p>我见过很多人为了享用某家特色小吃而在餐厅门口乐此不疲地排着长队，但没有听说有多少用户执着地等待着一个速度缓慢的站点而不去尝试别的站点。——《构建高性能web站点》</p>
+<p><strong>2.了解性能差异</strong></p>
+<p><strong>了解性能差异：站在CPU的角度看世界</strong></p>
+<p>内容来源：http://cizixs.com/2017/01/03/how-slow-is-disk-and-network/</p>
+<p>计算机不同组件速度差异金字塔见下图（不够直观）</p>
+<p>越往上速度越快，容量越小，而价格越高。</p>
+<p>​    <img src="D:%5Ccode%5Cnpsyche%5Cstatic%5Cimg%5Cfastfast1.png" alt="0"></p>
+<p>我们都知道CPU很快，硬盘很慢，那么站在CPU的角度，这些设备到底有多慢呢？见下方图表</p>
+<p>​    <img src="D:%5Ccode%5Cnpsyche%5Cstatic%5Cimg%5Cfastfast2.png" alt="0"></p>
+<p>扩展阅读：</p>
+<p>世界各地ping文时间：https://wondernetwork.com/pings/</p>
+<p>​    <img src="D:%5Ccode%5Cnpsyche%5Cstatic%5Cimg%5Cfastfast3.png" alt="0"></p>
+<p>结论：磁盘和网络真的很慢，性能优化是个复杂的系统性的活。</p>
+<p><strong>3.记一次性能优化的过程</strong></p>
+<p>来自某接口需求，性能要求支撑万级TPS，10ms返回。</p>
+<p>程序逻辑很简单，只是简单的k/v请求。</p>
+<p><strong>技术选型：</strong></p>
+<p>选用openresty容器（一个基于 Nginx 与Lua 的高性能 Web 平台），redis存储（毫无悬念），避免磁盘读取拖慢速度</p>
+<p><strong>服务器配置：</strong></p>
+<p>部署在同一区域（毫无悬念），减少不同城市网络访问。</p>
+<p>8核，16G</p>
+<p><strong>服务稳定性要求：</strong></p>
+<p>线上服务没有返回时，将进入离线计算，调用端做了保护，因此就算服务崩了也没事，唯一关注：快！</p>
+<p>因此大胆的作吧~</p>
+<p><strong>服务器内核参数调整：</strong></p>
+<p>ulimit -n 999999</p>
+<p>重启失效</p>
+<p>或：</p>
+<p>在/etc/security/limits.conf加入一下内容</p>
+<p># 最大不能超过fs.nr_open值, 分别为单用户进程最大文件打开数，soft指软性限制,hard指硬性限制</p>
+<p># End of file</p>
+<p>root      soft    nofile          999999</p>
+<p>root      hard    nofile          999999</p>
+<p>*         soft    nofile          999999</p>
+<p>*         hard    nofile          999999</p>
+<p>重启使上述内容生效</p>
+<p>不愿意重启就使用以下命令</p>
+<p>sysctl -p</p>
+<p>然，并没有什么卵用。。。</p>
+<p>wrk压力测试结果：上万并发，50%响应100多ms，90%响应200多ms，差了一个数量级</p>
+<p>继续优化，还有什么需要考虑？</p>
+<p>第一步，考虑优化web容器。</p>
+<p><strong>nginx参数优化</strong></p>
+<p><strong>vim nginx.conf</strong></p>
+<p>nginx配置：</p>
+<p># 子进程允许打开的连接数（nginx.conf）及 IO 选择</p>
+<p>#改为系统核数</p>
+<p># nginx 进程数，按照 CPU 数目指定</p>
+<p>worker_processes  8;</p>
+<p># nginx 子进程允许打开的文件次数</p>
+<p>worker_rlimit_nofile 102400;</p>
+<p>events {</p>
+<p># 子进程连接数</p>
+<p>worker_connections 65535;</p>
+<p>use epoll; #epoll是多路复用IO(I/O Multiplexing)中的一种方式,但是仅用于linux2.6以上内核,可以大大提高nginx的性能</p>
+<p>}</p>
+<p>如果你使用Linux 2.6+，你应该使用epoll。如果你使用*BSD，你应该使用kqueue。</p>
+<p>Web服务器所做的工作的本质就是，争取以最快的速度将内核缓冲区中的用户请求数据一个不剩地都拿回来，然后尽最大努力同时快速处理完这些请求，并将响应数据放到内核维护的另一块用于发送数据的缓冲区中，接下来再尽快处理下一拨请求，并尽量让用户请求在内核缓冲区中不要等太久。——《构建高性能web站点》</p>
+<p>IO如此之慢，阻塞IO不可取，因此只能考虑非阻塞IO方式。</p>
+<p>epoll,select,poll的区别：https://www.cnblogs.com/jeakeven/p/5435916.html</p>
+<p>​    <img src="https://note.youdao.com/yws/res/1705/WEBRESOURCEf3c99e5c30355f39cd9cb73d5ffead41" alt="0"></p>
+<p>第二步：linux内核tcp调优</p>
+<p>/etc/sysctl.conf是一个允许你改变正在运行中的Linux系统的接口。</p>
+<p>它包含一些TCP/IP堆栈和虚拟内存系统的高级选项，可用来控制Linux网络配置</p>
+<p>vim /etc/sysctl.conf</p>
+<p>net.ipv4.tcp_tw_reuse = 1             #表示是否允许将处于TIME-WAIT状态的socket（TIME-WAIT的端口）用于新的TCP连接 。</p>
+<p>net.ipv4.tcp_tw_recycle = 1             #能够更快地回收TIME-WAIT套接字。其他场景要小心调整此参数，可能引起连接错误。</p>
+<p>net.ipv4.ip_local_port_range = 10000 65000  #端口范围</p>
+<p>附上开发环境配置前后压测对比（至少10倍提升！）：</p>
+<p>优化背后的原理：</p>
+<p>TCP三次握手，四次挥手</p>
+<p>​    <img src="https://note.youdao.com/yws/res/1793/WEBRESOURCEd51894d43ec47348b4c0bfd6936f42fd" alt="0"></p>
+<p>​    <img src="https://note.youdao.com/yws/res/3433/D4539EFFE02048C7A62953B668BA633D" alt="0"></p>
+<p>什么是TCP TIME-WAIT状态</p>
+<p>由于TCP连接时全双工的，因此，每个方向都必须要单独进行关闭，这一原则是当一方完成数据发送任务后，发送一个FIN来终止这一方向的连接，收到一个FIN只是意味着这一方向上没有数据流动了，即不会再收到数据了，但是在这个TCP连接上仍然能够发送数据，直到这一方向也发送了FIN。首先进行关闭的一方将执行主动关闭，而另一方则执行被动关闭</p>
+<p>被动关闭：</p>
+<p>扩展，其他优化，可自行了解</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>默认值</th>
+<th>调优值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fs.file-max</td>
+<td>4096</td>
+<td>999999</td>
+<td>表示系统级别的能够打开的文件句柄的数量。是对整个系统的限制,并不是针对用户的。</td>
+</tr>
+<tr>
+<td>net.ipv4.tcp_rmem</td>
+<td>4096 87380 4011232</td>
+<td>4096 4096 16777216</td>
+<td>为自动调优定义socket使用的内存。包含3个整数值，分别是：min，default，max第一个值是为socket接收缓冲区分配的最少字节数；第二个值是默认值（该值会被rmem_default覆盖），缓冲区在系统负载不重的情况下可以增长到这个值；第三个值是接收缓冲区空间的最大字节数（该值会被rmem_max覆盖）。</td>
+</tr>
+<tr>
+<td>net.ipv4.tcp_wmem</td>
+<td>4096 16384 4011232</td>
+<td>4096 4096 16777216</td>
+<td>为自动调优定义socket使用的内存。包含3个整数值，分别是：min，default，max第一个值是为socket发送缓冲区分配的最少字节数；第二个值是默认值（该值会被wmem_default覆盖），缓冲区在系统负载不重的情况下可以增长到这个值；第三个值是发送缓冲区空间的最大字节数（该值会被wmem_max覆盖）。</td>
+</tr>
+<tr>
+<td>net.ipv4.tcp_mem</td>
+<td>94011 125351 188022</td>
+<td>786432 2097152 3145728</td>
+<td>确定TCP栈应该如何反映内存使用，每个值的单位都是内存页（通常是4KB）。包含3个整数值，分别是：low，pressure，high第一个值是内存使用的下限；第二个值是内存压力模式开始对缓冲区使用应用压力的上限；第三个值是内存使用的上限。在这个层次上可以将报文丢弃，从而减少对内存的使用。对于较大的BDP可以增大这些值（注意，其单位是内存页而不是字节）。</td>
+</tr>
+<tr>
+<td>net.ipv4.tcp_keepalive_time</td>
+<td>7200</td>
+<td>15</td>
+<td>TCP发送keepalive探测消息的间隔时间（秒），用于确认TCP连接是否有效。默认7200s(2 hours)和如下参数一起使用。tcp_keepalive_probes = 9tcp_keepalive_intvl = 75 seconds意思是如果某个TCP连接在idle tcp_keepalive_time后,内核才发起probe.如果probe tcp_keepalive_probes次(每次tcp_keepalive_intvl秒)不成功,内核才彻底放弃,认为该连接已失效</td>
+</tr>
+<tr>
+<td>net.ipv4.tcp_fin_timeout</td>
+<td>60</td>
+<td>30</td>
+<td>对于本端断开的socket连接，TCP保持在FIN-WAIT-2状态的时间（秒）。对方可能会断开连接或一直不结束连接或不可预料的进程死亡。</td>
+</tr>
+<tr>
+<td>net.ipv4.tcp_max_tw_buckets</td>
+<td>180000</td>
+<td>204800</td>
+<td>设置保持TIME_WAIT的最大数量,如果超过这个数量,TIME_WAIT将立刻清楚并打印警告信息。默认18W，可调大 用来防范简单的DoS攻击，可以控制TIME_WAIT的最大数量建议使用默认值,不建议调小不恰当配置会出现Time wait bucket table overflow 报错# see details in <a href="https://help.aliyun.com/knowledge_detail/41334.html">https://help.aliyun.com/knowledge_detail/41334.html</a>阿里云服务器默认配置5000</td>
+</tr>
+<tr>
+<td>net.ipv4.tcp_max_syn_backlog</td>
+<td>2048</td>
+<td>16384</td>
+<td>对于还未获得对方确认的连接请求，可保存在队列中的最大数目。如果服务器经常出现过载，可以尝试增加这个数字。</td>
+</tr>
+<tr>
+<td>net.ipv4.tcp_tw_reuse</td>
+<td>0</td>
+<td>1</td>
+<td>表示是否允许将处于TIME-WAIT状态的socket（TIME-WAIT的端口）用于新的TCP连接 。</td>
+</tr>
+<tr>
+<td>net.ipv4.tcp_tw_recycle</td>
+<td>0</td>
+<td>1</td>
+<td>能够更快地回收TIME-WAIT套接字。其他场景要小心调整此参数，可能引起连接错误。</td>
+</tr>
+<tr>
+<td>net.ipv4.tcp_fin_timeout</td>
+<td>60</td>
+<td>15</td>
+<td>对于本端断开的socket连接，TCP保持在FIN-WAIT-2状态的时间（秒）。对方可能会断开连接或一直不结束连接或不可预料的进程死亡。</td>
+</tr>
+<tr>
+<td>net.ipv4.tcp_max_orphans</td>
+<td>8192</td>
+<td>131072</td>
+<td>系统所能处理不属于任何进程的TCP sockets最大数量。假如超过这个数量，那么不属于任何进程的连接会被立即reset，并同时显示警告信息。之所以要设定这个限制，纯粹为了抵御那些简单的 DoS 攻击，千万不要依赖这个或是人为的降低这个限制。对于net.ipv4.tcp_max_orphans = 65536，当orphans达到32768个时，会报Out of socket memory，此时占用内存 32K*64KB=2048MB=2GB</td>
+</tr>
+<tr>
+<td>net.ipv4.tcp_syncookies</td>
+<td>0</td>
+<td>1</td>
+<td>0表示禁用,1表示启用,表示开启SYN Cookies,当SYN等待队列溢出时,启用cookies来处理,可以防范少量的SYN攻击,默认为0,表示关闭</td>
+</tr>
+<tr>
+<td>net.ipv4.ip_local_port_range</td>
+<td>32768 61000</td>
+<td>10000 65000</td>
+<td>端口范围</td>
+</tr>
+<tr>
+<td>net.core.netdev_max_backlog</td>
+<td>1000</td>
+<td>8096</td>
+<td>在每个网络接口接收数据包的速率比内核处理这些包的速率快时，允许送到队列的数据包的最大数目。</td>
+</tr>
+<tr>
+<td>net.core.somaxconn</td>
+<td>128</td>
+<td>262144</td>
+<td>定义了系统中每一个端口最大的监听队列的长度，这是个全局的参数。用于调节系统同时发起的tcp连接数，在高并发请求中，默认的值可能会导致连接超时或重传，因此，需要结合并发请求数来调节此值。</td>
+</tr>
+<tr>
+<td>net.core.rmem_default</td>
+<td>110592</td>
+<td>262144</td>
+<td>默认的TCP数据接收窗口大小（字节）。</td>
+</tr>
+<tr>
+<td>net.core.wmem_default</td>
+<td>110592</td>
+<td>262144</td>
+<td>默认的TCP数据发送窗口大小（字节）。</td>
+</tr>
+<tr>
+<td>net.core.rmem_max</td>
+<td>131071</td>
+<td>16777216</td>
+<td>最大的TCP数据接收窗口（字节）。</td>
+</tr>
+<tr>
+<td>net.core.wmem_max</td>
+<td>131071</td>
+<td>16777216</td>
+<td>最大的TCP数据发送窗口（字节）。</td>
+</tr>
+</tbody>
+</table>
+<p>net.ipv4.tcp_timestamps = 1            //在net.ipv4.tcp_tw_recycle设置为1的时候，这个选择最好加上</p>
+<p>net.ipv4.tcp_syncookies = 1</p>
+<p>net.ipv4.tcp_max_syn_backlog = 20480</p>
+<p>net.ipv4.tcp_synack_retries = 1</p>
+<p>net.ipv4.tcp_syn_retries = 1</p>
+<p><strong>wrk压力测试工具介绍：</strong></p>
+<p>wrk 的一个很好的特性就是能用很少的线程压出很大的并发量. 原因是它使用了一些操作系统特定的高性能 io 机制, 比如 select, epoll, kqueue 等. 安装很简单，见网上教程。此处不啰嗦。</p>
+<p>[root@localhost ~]# dmesg</p>
+<p>possible SYN flooding on port 80. Sending cookies.</p>
+<p>TCP: time wait bucket table overflow</p>
+<p>最后一次调整，使用工具strace进行跟踪：</p>
+<p>日志中多次出现：</p>
+<p>17:31:21.937510 socket(PF_INET, SOCK_STREAM|SOCK_CLOEXEC, IPPROTO_IP) = 18 &lt;0.000015&gt;</p>
+<p>17:31:21.937550 ioctl(18, FIONBIO, [1]) = 0 &lt;0.000006&gt;</p>
+<p>17:31:21.937576 fcntl(18, F_SETFD, FD_CLOEXEC) = 0 &lt;0.000006&gt;</p>
+<p>17:31:21.937597 epoll_ctl(7, EPOLL_CTL_ADD, 18, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2565218496, u64=140516715274432}}) = 0 &lt;0.000007&gt;</p>
+<p>17:31:21.937621 connect(18, {sa_family=AF_INET, sin_port=htons(6379), sin_addr=inet_addr(&ldquo;127.0.0.1&rdquo;)}, 16) = -1 EINPROGRESS (Operation now in progress) &lt;0.000025&gt;</p>
+<p>17:31:21.937669 recvfrom(16, &ldquo;$49\r\n0109,010103,032202,0402,080&rdquo;&hellip;, 4096, 0, NULL, NULL) = 56 &lt;0.000008&gt;</p>
+<p>17:31:21.937709 close(16) = 0 &lt;0.000018&gt;</p>
+<p>结论：多次和redis进行交互。</p>
+<p>第四次优化点：</p>
+<p>nginx中配置：</p>
+<p>upstream redis_nodes {</p>
+<p>server 127.0.0.1:6379;</p>
+<p>keepalive 1024;</p>
+<p>}</p>
+<p>调整后，TPS从3K到9K，响应时间从300多ms降到20多ms.</p>
+<p>使用工具strace进行跟踪，再也没有出现以上日志。</p>
+<p><strong>结论：</strong></p>
+<p>天下武功，唯快不破~</p>
+<p>​    <img src="https://note.youdao.com/yws/res/1652/WEBRESOURCE81d71e55b2ee3826f8146823f62492ec" alt="0"></p>
+
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://npsyche.github.io/tags/%E5%86%85%E6%A0%B8">内核</a></span>
+        
+            <span class="tag"><a href="https://npsyche.github.io/tags/%E8%B0%83%E4%BC%98">调优</a></span>
+        
+            <span class="tag"><a href="https://npsyche.github.io/tags/%E9%AB%98%E5%B9%B6%E5%8F%91">高并发</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://npsyche.github.io/2022/fastfast/">万级并发之linux内核tcp参数调优</a></h1>
+            <time class="has-text-grey-light is-size-7">29 April 2022</time>
+        
+            <h1><a href="https://npsyche.github.io/2022/20220426/">关于苏三</a></h1>
+            <time class="has-text-grey-light is-size-7">26 April 2022</time>
+        
+    </div>
+</div>
+    <br>
+                
+
+
+    
+<br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://npsyche.github.io/archives/2022">2022</a> (2)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+            <span class="icon is-large"><a href="https://twitter.com/" class="mysocial" rel="me"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.youtube.com/" class="mysocial" rel="me"><i class="fab fa-youtube fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/" class="mysocial" rel="me"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+            <br><br>
+            Copyright &copy; 苏三个人技术博客 2022 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="https://npsyche.github.io/about">About</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>
