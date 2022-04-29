@@ -53,12 +53,12 @@
 <p>内容来源：http://cizixs.com/2017/01/03/how-slow-is-disk-and-network/</p>
 <p>计算机不同组件速度差异金字塔见下图（不够直观）</p>
 <p>越往上速度越快，容量越小，而价格越高。</p>
-<p>​    <img src="D:%5Ccode%5Cnpsyche%5Cstatic%5Cimg%5Cfastfast1.png" alt="0"></p>
+<p>​    <img src="https://npsyche.github.io/img/fastfast1.png" alt="0"></p>
 <p>我们都知道CPU很快，硬盘很慢，那么站在CPU的角度，这些设备到底有多慢呢？见下方图表</p>
-<p>​    <img src="D:%5Ccode%5Cnpsyche%5Cstatic%5Cimg%5Cfastfast2.png" alt="0"></p>
+<p>​    <img src="https://npsyche.github.io/img/fastfast2.png" alt="0"></p>
 <p>扩展阅读：</p>
 <p>世界各地ping文时间：https://wondernetwork.com/pings/</p>
-<p>​    <img src="D:%5Ccode%5Cnpsyche%5Cstatic%5Cimg%5Cfastfast3.png" alt="0"></p>
+<p>​    <img src="https://npsyche.github.io/img/fastfast3.png" alt="0"></p>
 <p>结论：磁盘和网络真的很慢，性能优化是个复杂的系统性的活。</p>
 <p><strong>3.记一次性能优化的过程</strong></p>
 <p>来自某接口需求，性能要求支撑万级TPS，10ms返回。</p>
@@ -107,7 +107,7 @@
 <p>Web服务器所做的工作的本质就是，争取以最快的速度将内核缓冲区中的用户请求数据一个不剩地都拿回来，然后尽最大努力同时快速处理完这些请求，并将响应数据放到内核维护的另一块用于发送数据的缓冲区中，接下来再尽快处理下一拨请求，并尽量让用户请求在内核缓冲区中不要等太久。——《构建高性能web站点》</p>
 <p>IO如此之慢，阻塞IO不可取，因此只能考虑非阻塞IO方式。</p>
 <p>epoll,select,poll的区别：https://www.cnblogs.com/jeakeven/p/5435916.html</p>
-<p>​    <img src="https://note.youdao.com/yws/res/1705/WEBRESOURCEf3c99e5c30355f39cd9cb73d5ffead41" alt="0"></p>
+<p>​    <img src="https://npsyche.github.io/img/fastfast4.png" alt="0"></p>
 <p>第二步：linux内核tcp调优</p>
 <p>/etc/sysctl.conf是一个允许你改变正在运行中的Linux系统的接口。</p>
 <p>它包含一些TCP/IP堆栈和虚拟内存系统的高级选项，可用来控制Linux网络配置</p>
@@ -118,8 +118,8 @@
 <p>附上开发环境配置前后压测对比（至少10倍提升！）：</p>
 <p>优化背后的原理：</p>
 <p>TCP三次握手，四次挥手</p>
-<p>​    <img src="https://note.youdao.com/yws/res/1793/WEBRESOURCEd51894d43ec47348b4c0bfd6936f42fd" alt="0"></p>
-<p>​    <img src="https://note.youdao.com/yws/res/3433/D4539EFFE02048C7A62953B668BA633D" alt="0"></p>
+<p>​    <img src="https://npsyche.github.io/img/fastfast5.png" alt="0"></p>
+<p>​    <img src="https://npsyche.github.io/img/fastfast6.png" alt="0"></p>
 <p>什么是TCP TIME-WAIT状态</p>
 <p>由于TCP连接时全双工的，因此，每个方向都必须要单独进行关闭，这一原则是当一方完成数据发送任务后，发送一个FIN来终止这一方向的连接，收到一个FIN只是意味着这一方向上没有数据流动了，即不会再收到数据了，但是在这个TCP连接上仍然能够发送数据，直到这一方向也发送了FIN。首先进行关闭的一方将执行主动关闭，而另一方则执行被动关闭</p>
 <p>被动关闭：</p>
@@ -286,7 +286,7 @@
 <p>使用工具strace进行跟踪，再也没有出现以上日志。</p>
 <p><strong>结论：</strong></p>
 <p>天下武功，唯快不破~</p>
-<p>​    <img src="https://note.youdao.com/yws/res/1652/WEBRESOURCE81d71e55b2ee3826f8146823f62492ec" alt="0"></p>
+<p>​    <img src="https://npsyche.github.io/img/fastfast7.png" alt="0"></p>
 
             </div>
         </div>
