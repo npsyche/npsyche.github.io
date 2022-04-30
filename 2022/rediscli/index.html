@@ -3,14 +3,13 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>苏三个人技术博客  | Archives</title>
+    <title>苏三个人技术博客  | 千万级数据分钟级入库脚本PG2Redis</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
     <link rel="stylesheet" href="https://npsyche.github.io/css/blog.css" />
-    <link rel="alternate" type="application/rss+xml" href="https://npsyche.github.io/archives/index.xml" title="苏三个人技术博客" />
     </head>
 <body>
 
@@ -29,7 +28,7 @@
                 <br>
                 <h1 class="title is-size-1">
                     
-                        Archive Archives
+                        千万级数据分钟级入库脚本PG2Redis
                     
                 </h1>
                 
@@ -42,11 +41,67 @@
     <div class="section">
     
 
-
 <div class="columns">
     <div class="column is-9">
         <div class="tile is-child box">
             <div class="content">
+                <p>工作中常常需要将重要高频数据放入redis中供使用，如下方法是最便捷最快速的方式。</p>
+<p>已验证过</p>
+<h4 id="1将数据库数据批量导出为文件如txt">1.将数据库数据批量导出为文件，如txt</h4>
+<p>dataredis.txt文件中数据的存放格式要求比较严格，换行符必须使用“\r\n”,数据格式如：</p>
+<pre tabindex="0"><code>*3
+$3
+SET
+$9
+susantest
+$4
+test
+</code></pre><p>数据内容的解释：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">*3</th>
+<th>表示有三个参数：SET susantest test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">$3</td>
+<td>对第一个参数SET计算长度得到的值</td>
+</tr>
+<tr>
+<td style="text-align:left">SET</td>
+<td>redis的执行数据操作的命令</td>
+</tr>
+<tr>
+<td style="text-align:left">$9</td>
+<td>对第二个参数（susantest）计算得到的长度</td>
+</tr>
+<tr>
+<td style="text-align:left">susantest</td>
+<td>存放数据的KEY</td>
+</tr>
+<tr>
+<td style="text-align:left">$4</td>
+<td>对第三个参数计算得到的长度</td>
+</tr>
+<tr>
+<td style="text-align:left">test</td>
+<td>KEY对应的value值</td>
+</tr>
+</tbody>
+</table>
+<h4 id="2将数据库内容导出为特定格式的文本">2.将数据库内容导出为特定格式的文本</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>export PGPASSWORD<span style="color:#f92672">=</span>postgres
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>psql -h 192.168.1.67 -U postgres -d sdx -t -A -c <span style="color:#e6db74">&#34;SELECT &#39;*3&#39;||chr(10)||&#39;</span>$<span style="color:#e6db74">&#39;||LENGTH(&#39;SET&#39;)||chr(10)||&#39;SET&#39;||chr(10)||&#39;</span>$<span style="color:#e6db74">&#39;||LENGTH(code)||chr(10)||code||chr(10)||&#39;</span>$<span style="color:#e6db74">&#39;||LENGTH (uuid)||chr(10)||uuid||chr(10) FROM shop where shop_source=&#39;my&#39;&#34;</span> &gt;&gt;format2redis.txt
+</span></span></code></pre></div><h4 id="3在linux机器上执行脚本">3.在linux机器上执行脚本</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>cat format2redis.txt | redis-cli -h 192.168.1.67 -c -p <span style="color:#ae81ff">6379</span> -n <span style="color:#ae81ff">2</span> --pipe &amp;
+</span></span></code></pre></div><p>redis-cli参数：</p>
+<p>-n 选择database</p>
+<p>（100多万数据5秒左右入redis，redis-cli为redis 2.4.14版本后出的）</p>
 
             </div>
         </div>
@@ -86,6 +141,11 @@
     </div>
 </div>
     <br>
+                
+
+
+    
+<br>
         <div class="card">
     <div class="card-content">
         <h1 class="title is-5">Archives</h1>
@@ -97,7 +157,6 @@
 
     </div>
 </div>
-
 
 
     </div>

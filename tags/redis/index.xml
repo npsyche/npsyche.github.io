@@ -1,0 +1,25 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>redis on 苏三个人技术博客</title>
+    <link>https://npsyche.github.io/tags/redis/</link>
+    <description>Recent content in redis on 苏三个人技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-Hans</language>
+    <lastBuildDate>Sat, 30 Apr 2022 19:37:07 +0800</lastBuildDate>
+    
+        <atom:link href="https://npsyche.github.io/tags/redis/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>千万级数据分钟级入库脚本PG2Redis</title>
+      <link>https://npsyche.github.io/2022/rediscli/</link>
+      <pubDate>Sat, 30 Apr 2022 19:37:07 +0800</pubDate>
+      
+      <guid>https://npsyche.github.io/2022/rediscli/</guid>
+      <description>工作中常常需要将重要高频数据放入redis中供使用，如下方法是最便捷最快速的方式。
+已验证过
+1.将数据库数据批量导出为文件，如txt dataredis.</description>
+    </item>
+    
+  </channel>
+</rss>
