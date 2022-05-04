@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>苏三个人技术博客  | Docker简介和使用</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://npsyche.github.io/css/blog.css" />
+    </head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://npsyche.github.io/">Home</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://npsyche.github.io/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Docker简介和使用
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+            <div class="content">
+                <h4 id="1简介">1.简介</h4>
+<p><strong>官方介绍</strong></p>
+<p>Docker是一种轻量级的虚拟化技术，同时是一个开源的应用容器运行环境搭建平台，可以让开发者以便捷方式打包应用到一个可移植的容器中，然后安装至任何运行Linux或Windows等系统的服务器上。</p>
+<p>相较于传统虚拟机，Docker容器提供轻量化的虚拟化方式、安装便捷、启停速度快。</p>
+<p><strong>Docker</strong></p>
+<p>是一个开源的应用容器引擎；</p>
+<p>是一个轻量级容器技术；</p>
+<p>Docker支持将软件编译成一个镜像；</p>
+<p>然后在镜像中各种软件做好配置，将镜像发布出去，其他使用者可以直接使用这个镜像；</p>
+<p>运行中的这个镜像称为容器，容器启动是非常快速的。</p>
+<p><img src="D:%5Ccode%5Cnpsyche%5Cpublic%5Cimg%5Cdocker%5C145531.png" alt="img"></p>
+<p><img src="https://npsyche.github.io/img/docker/145531.png" alt="img"></p>
+<h4 id="2核心概念">2.核心概念</h4>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>英文</th>
+<th>简介</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>docker主机</td>
+<td>Host</td>
+<td>安装了Docker程序的机器（Docker直接安装在操作系统之上）</td>
+</tr>
+<tr>
+<td>docker客户端</td>
+<td>Client</td>
+<td>连接docker主机进行操作</td>
+</tr>
+<tr>
+<td>docker仓库</td>
+<td>Registry</td>
+<td>用来保存各种打包好的软件镜像</td>
+</tr>
+<tr>
+<td>docker镜像</td>
+<td>Images</td>
+<td>软件打包好的镜像；放在docker仓库中</td>
+</tr>
+<tr>
+<td>docker容器</td>
+<td>Container</td>
+<td>镜像启动后的实例称为一个容器；容器是独立运行的一个或一组应用</td>
+</tr>
+</tbody>
+</table>
+<p><img src="D:%5Ccode%5Cnpsyche%5Cpublic%5Cimg%5Cdocker%5C165113.png" alt="img"></p>
+<p><img src="https://npsyche.github.io/img/docker/165113.png" alt="img"></p>
+<h4 id="3docker使用步骤">3.Docker使用步骤</h4>
+<ol>
+<li>安装Docker</li>
+<li>去Docker仓库找到这个软件对应的镜像；</li>
+<li>使用Docker运行这个镜像，这个镜像就会生成一个Docker容器；</li>
+<li>对容器的启动停止就是对软件的启动停止</li>
+</ol>
+<h5 id="31安装docker">3.1.安装Docker</h5>
+<p>window系统先安装linux虚拟机</p>
+<p>在linux虚拟机上安装docker步骤：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>1、检查内核版本，必须是3.10及以上
+</span></span><span style="display:flex;"><span>uname -r
+</span></span><span style="display:flex;"><span>2、安装docker
+</span></span><span style="display:flex;"><span>yum install docker
+</span></span><span style="display:flex;"><span>3、输入y确认安装
+</span></span><span style="display:flex;"><span>4、启动docker
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@localhost ~<span style="color:#f92672">]</span><span style="color:#75715e"># systemctl start docker</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@localhost ~<span style="color:#f92672">]</span><span style="color:#75715e"># docker -v</span>
+</span></span><span style="display:flex;"><span>Docker version 1.12.6, build 3e8e77d/1.12.6
+</span></span><span style="display:flex;"><span>5、开机启动docker
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@localhost ~<span style="color:#f92672">]</span><span style="color:#75715e"># systemctl enable docker</span>
+</span></span><span style="display:flex;"><span>Created symlink from /etc/systemd/system/multi-user.target.wants/docker.service to /usr/lib/systemd/system/docker.service.
+</span></span><span style="display:flex;"><span>6、停止docker
+</span></span><span style="display:flex;"><span>systemctl stop docker
+</span></span></code></pre></div><h5 id="32docker常用命令操作">3.2.Docker常用命令&amp;操作</h5>
+<p><strong>镜像操作</strong></p>
+<p><a href="https://hub.docker.com/">https://hub.docker.com/</a></p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>检索</td>
+<td>docker search 关键字 eg：docker search redis</td>
+<td>我们经常去docker hub上检索镜像的详细信息，如镜像的TAG。</td>
+</tr>
+<tr>
+<td>拉取</td>
+<td>docker pull 镜像名:tag</td>
+<td>:tag是可选的，tag表示标签，多为软件的版本，默认是latest</td>
+</tr>
+<tr>
+<td>列表</td>
+<td>docker images</td>
+<td>查看所有本地镜像</td>
+</tr>
+<tr>
+<td>删除</td>
+<td>docker rmi image-id</td>
+<td>删除指定的本地镜像</td>
+</tr>
+</tbody>
+</table>
+<p><strong>容器操作</strong></p>
+<p>软件镜像（安装程序）&mdash;-运行镜像&mdash;-产生一个容器（正在运行的软件）；</p>
+<p>更多命令:
+<a href="https://docs.docker.com/engine/reference/commandline/docker/">https://docs.docker.com/engine/reference/commandline/docker/</a></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>1、搜索镜像
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@localhost ~<span style="color:#f92672">]</span><span style="color:#75715e"># docker search tomcat</span>
+</span></span><span style="display:flex;"><span>2、拉取镜像
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@localhost ~<span style="color:#f92672">]</span><span style="color:#75715e"># docker pull tomcat</span>
+</span></span><span style="display:flex;"><span>3、根据镜像启动容器
+</span></span><span style="display:flex;"><span>docker run --name mytomcat -d tomcat:latest
+</span></span><span style="display:flex;"><span>4、docker ps  
+</span></span><span style="display:flex;"><span>查看运行中的容器
+</span></span><span style="display:flex;"><span>5、 停止运行中的容器
+</span></span><span style="display:flex;"><span>docker stop  容器的id
+</span></span><span style="display:flex;"><span>6、查看所有的容器
+</span></span><span style="display:flex;"><span>docker ps -a
+</span></span><span style="display:flex;"><span>7、启动容器
+</span></span><span style="display:flex;"><span>docker start 容器id
+</span></span><span style="display:flex;"><span>8、删除一个容器
+</span></span><span style="display:flex;"><span> docker rm 容器id
+</span></span><span style="display:flex;"><span>9、启动一个做了端口映射的tomcat
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@localhost ~<span style="color:#f92672">]</span><span style="color:#75715e"># docker run -d -p 8888:8080 tomcat</span>
+</span></span><span style="display:flex;"><span>-d：后台运行
+</span></span><span style="display:flex;"><span>-p: 将主机的端口映射到容器的一个端口 主机端口:容器内部的端口
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>10、为了演示简单关闭了linux的防火墙
+</span></span><span style="display:flex;"><span>service firewalld status ；查看防火墙状态
+</span></span><span style="display:flex;"><span>service firewalld stop：关闭防火墙
+</span></span><span style="display:flex;"><span>11、查看容器的日志
+</span></span><span style="display:flex;"><span>docker logs container-name/container-id
+</span></span></code></pre></div><h4 id="4安装mysql示例">4.安装MySQL示例</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>docker pull mysql
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@localhost ~<span style="color:#f92672">]</span><span style="color:#75715e"># docker run --name mysql01 -e MYSQL_ROOT_PASSWORD=123456 -d mysql</span>
+</span></span><span style="display:flex;"><span>b874c56bec49fb43024b3805ab51e9097da779f2f572c22c695305dedd684c5f
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@localhost ~<span style="color:#f92672">]</span><span style="color:#75715e"># docker ps</span>
+</span></span><span style="display:flex;"><span>CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+</span></span><span style="display:flex;"><span>b874c56bec49        mysql               <span style="color:#e6db74">&#34;docker-entrypoint.sh&#34;</span>   <span style="color:#ae81ff">4</span> seconds ago       Up <span style="color:#ae81ff">3</span> seconds        3306/tcp            mysql01
+</span></span></code></pre></div><p>端口映射</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@localhost ~<span style="color:#f92672">]</span><span style="color:#75715e"># docker run -p 3306:3306 --name mysql02 -e MYSQL_ROOT_PASSWORD=123456 -d mysql</span>
+</span></span><span style="display:flex;"><span>ad10e4bc5c6a0f61cbad43898de71d366117d120e39db651844c0e73863b9434
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@localhost ~<span style="color:#f92672">]</span><span style="color:#75715e"># docker ps</span>
+</span></span><span style="display:flex;"><span>CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+</span></span><span style="display:flex;"><span>ad10e4bc5c6a        mysql               <span style="color:#e6db74">&#34;docker-entrypoint.sh&#34;</span>   <span style="color:#ae81ff">4</span> seconds ago       Up <span style="color:#ae81ff">2</span> seconds        0.0.0.0:3306-&gt;3306/tcp   mysql02
+</span></span></code></pre></div><p>高级操作</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>docker run --name mysql03 -v /conf/mysql:/etc/mysql/conf.d -e MYSQL_ROOT_PASSWORD<span style="color:#f92672">=</span>my-secret-pw -d mysql:tag
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#把主机的/conf/mysql文件夹挂载到 mysqldocker容器的/etc/mysql/conf.d文件夹里面</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#改mysql的配置文件就只需要把mysql配置文件放在自定义的文件夹下（/conf/mysql）</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>docker run --name some-mysql -e MYSQL_ROOT_PASSWORD<span style="color:#f92672">=</span>my-secret-pw -d mysql:tag --character-set-server<span style="color:#f92672">=</span>utf8mb4 --collation-server<span style="color:#f92672">=</span>utf8mb4_unicode_ci
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#指定mysql的一些配置参数</span>
+</span></span></code></pre></div>
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://npsyche.github.io/tags/docker">docker</a></span>
+        
+            <span class="tag"><a href="https://npsyche.github.io/tags/redis">redis</a></span>
+        
+            <span class="tag"><a href="https://npsyche.github.io/tags/%E5%86%85%E6%A0%B8">内核</a></span>
+        
+            <span class="tag"><a href="https://npsyche.github.io/tags/%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86">数据处理</a></span>
+        
+            <span class="tag"><a href="https://npsyche.github.io/tags/%E8%B0%83%E4%BC%98">调优</a></span>
+        
+            <span class="tag"><a href="https://npsyche.github.io/tags/%E9%AB%98%E5%B9%B6%E5%8F%91">高并发</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://npsyche.github.io/2022/docker/">Docker简介和使用</a></h1>
+            <time class="has-text-grey-light is-size-7">4 May 2022</time>
+        
+            <h1><a href="https://npsyche.github.io/2022/rediscli/">千万级数据分钟级入库脚本PG2Redis</a></h1>
+            <time class="has-text-grey-light is-size-7">30 April 2022</time>
+        
+            <h1><a href="https://npsyche.github.io/2022/fastfast/">万级并发之linux内核tcp参数调优</a></h1>
+            <time class="has-text-grey-light is-size-7">29 April 2022</time>
+        
+    </div>
+</div>
+    <br>
+                
+
+
+    
+<br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://npsyche.github.io/archives/2022">2022</a> (3)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+            <span class="icon is-large"><a href="https://twitter.com/" class="mysocial" rel="me"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.youtube.com/" class="mysocial" rel="me"><i class="fab fa-youtube fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/" class="mysocial" rel="me"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+            <br><br>
+            Copyright &copy; 苏三个人技术博客 2022 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="https://npsyche.github.io/about">About</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

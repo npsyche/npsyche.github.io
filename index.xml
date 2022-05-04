@@ -5,7 +5,7 @@
     <description>Recent content on 苏三个人技术博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-Hans</language>
-    <lastBuildDate>Sat, 30 Apr 2022 19:37:07 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 04 May 2022 11:23:31 +0800</lastBuildDate>
     
         <atom:link href="https://npsyche.github.io/index.xml" rel="self" type="application/rss+xml" />
     
@@ -13,10 +13,19 @@
     <item>
       <title>Posts</title>
       <link>https://npsyche.github.io/post/</link>
-      <pubDate>Sat, 30 Apr 2022 19:37:07 +0800</pubDate>
+      <pubDate>Wed, 04 May 2022 11:23:31 +0800</pubDate>
       
       <guid>https://npsyche.github.io/post/</guid>
       <description></description>
+    </item>
+    
+    <item>
+      <title>Susan Resume</title>
+      <link>https://npsyche.github.io/about/</link>
+      <pubDate>Tue, 26 Apr 2022 11:20:25 +0800</pubDate>
+      
+      <guid>https://npsyche.github.io/about/</guid>
+      <description>苏三 深圳南山区 求职意向：Java后端/技术经理/架构师</description>
     </item>
     
   </channel>

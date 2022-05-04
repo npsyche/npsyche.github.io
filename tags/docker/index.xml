@@ -1,0 +1,24 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>docker on 苏三个人技术博客</title>
+    <link>https://npsyche.github.io/tags/docker/</link>
+    <description>Recent content in docker on 苏三个人技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-Hans</language>
+    <lastBuildDate>Wed, 04 May 2022 11:23:31 +0800</lastBuildDate>
+    
+        <atom:link href="https://npsyche.github.io/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Docker简介和使用</title>
+      <link>https://npsyche.github.io/2022/docker/</link>
+      <pubDate>Wed, 04 May 2022 11:23:31 +0800</pubDate>
+      
+      <guid>https://npsyche.github.io/2022/docker/</guid>
+      <description>1.简介 官方介绍
+Docker是一种轻量级的虚拟化技术，同时是一个开源的应用容器运行环境搭建平台，可以让开发者以便捷方式打包应用到一个可移植的容器中，然后安装至任何运行Linux或Windows等系统的服务器上。</description>
+    </item>
+    
+  </channel>
+</rss>
