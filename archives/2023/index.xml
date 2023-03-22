@@ -1,0 +1,25 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>2023 on 苏三个人技术博客</title>
+    <link>https://npsyche.github.io/archives/2023/</link>
+    <description>Recent content in 2023 on 苏三个人技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-Hans</language>
+    <lastBuildDate>Wed, 22 Mar 2023 15:58:51 +0800</lastBuildDate>
+    
+        <atom:link href="https://npsyche.github.io/archives/2023/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>国内注册使用ChatGPT保姆级教程</title>
+      <link>https://npsyche.github.io/2023/chatgpt-signup/</link>
+      <pubDate>Wed, 22 Mar 2023 15:58:51 +0800</pubDate>
+      
+      <guid>https://npsyche.github.io/2023/chatgpt-signup/</guid>
+      <description>此篇文章介绍如下内容
+1.关于ChatGPT和它的功能简介
+2.注册ChatGPT步骤</description>
+    </item>
+    
+  </channel>
+</rss>

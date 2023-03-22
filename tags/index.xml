@@ -5,10 +5,19 @@
     <description>Recent content in Tags on 苏三个人技术博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-Hans</language>
-    <lastBuildDate>Wed, 04 May 2022 11:23:31 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 22 Mar 2023 15:58:51 +0800</lastBuildDate>
     
         <atom:link href="https://npsyche.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>chatgpt</title>
+      <link>https://npsyche.github.io/tags/chatgpt/</link>
+      <pubDate>Wed, 22 Mar 2023 15:58:51 +0800</pubDate>
+      
+      <guid>https://npsyche.github.io/tags/chatgpt/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>docker</title>
